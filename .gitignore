@@ -1,0 +1,9 @@
+__pycache__
+DiscordChatExporter.Cli.osx-arm64
+*.csv
+*.html
+*.ipynb
+.ipynb_checkpoints
+.git
+.venv
+.vscode
