@@ -7,16 +7,38 @@ from sys import argv
 from time import time
 
 
-# demo: print and save archive (in working dir) as csv
-#       exclude .html from archive name
+# python demos.py <archive> <demo>
+#
+# archive: path to exported archive, without suffix. archive file's suffix must be .html
+# demo: display, post_count
 
-def run(archive):
+
+def display(df):
+
+    print(df.shape)
+    print(df)
+
+
+def post_count(df):
+
+    pass
+
+
+def run(archive, demo):
 
     t0 = time()
+
+    demos = {
+        'display': display,
+        'post_count': post_count
+    }
     
     pl.Config.set_tbl_rows(-1)
     pl.Config.set_tbl_cols(-1)
 
+    # if csv doesn't exist, create dataframe from html archive and 
+    # write it to disk for next run
+    
     if not os.path.exists(f'{archive}.csv'):
 
         root = bs(open(f'{archive}.html').read(), 'lxml')
@@ -27,12 +49,15 @@ def run(archive):
 
         df = pl.read_csv(f'{archive}.csv')
 
-    print(df.shape)
-    print(df)
+    demos[demo](df)
+
     print(f'{time() - t0:0.2f}s')
 
 
 if __name__ == '__main__':
 
-    run(argv[1])
+    archive = argv[1]
+    demo = argv[2]
+    
+    run(archive, demo)
     
