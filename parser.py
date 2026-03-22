@@ -1,20 +1,12 @@
+from bs4 import BeautifulSoup as bs
 import polars as pl
 import re
 
+schema = {
+    'ts'
+}
 
-# tree() helper
 
-def tree_(root, pre):
-
-    attrs = ''
-    class_ = ''
-    
-    if hasattr(root, 'attrs'):
-        
-        attrs = ', '.join(root.attrs.keys())
-        class_ = f'.{','.join(root.attrs['class'])}' if 'class' in root.attrs else ''
-    
-    print(f'{pre}{root.name}{class_}: {attrs}')
 # tree() helper
 
 def tree_(root, pre):
@@ -46,8 +38,9 @@ def tree(root):
 
 # from document root, return dataframe summarizing messages i -> j
 
-def get_df(root, i = 0, j = None):
+def read_html(path, i = 0, j = None):
 
+    root = bs(open(path).read(), 'lxml')
     msgs = root.select('div.chatlog__message')[i:j]
     
     elems = [ 'div', 'span' ]

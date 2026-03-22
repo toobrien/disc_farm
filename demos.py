@@ -1,15 +1,13 @@
-from bs4 import BeautifulSoup as bs
-import os
-from parser import get_df
+
+from parser import read_html
 import plotly.graph_objects as go
 import polars as pl
 from sys import argv
 from time import time
 
-
 # python demos.py <archive> <demo>
 #
-# archive: path to exported archive, without suffix. archive file's suffix must be .html
+# archive: path to exported archive
 # demo: display, post_count
 
 
@@ -21,10 +19,64 @@ def display(df):
 
 def post_count(df):
 
+    # monthly post count 
+
+    df = df.with_columns(
+        pl.date(
+            pl.col('ts').dt.year(),
+            pl.col('ts').dt.month(),
+            1
+        ).alias('date')
+    )
+
+    p_counts = df.group_by(
+        pl.col('date'),
+        pl.col('username')
+    ).agg(
+        pl.len().alias('post_count')
+    ).sort('date')
+
+    per_user = p_counts.group_by('username', maintain_order = True)
+    total = p_counts.group_by('date').agg(pl.col('post_count').sum())
+
+    fig = go.Figure()
+
+    trace_data = [
+        ( 
+            u[0][0],
+            u[1]['date'].to_list(),
+            u[1]['post_count'].to_list()
+        )
+        for u in per_user
+    ]
+
+    trace_data.append(
+        ( 
+            'total', 
+            total['date'].to_list(), 
+            total['post_count'].to_list()
+        )
+    )
+
+    trace_data = sorted(trace_data, key = lambda t: t[0])
+
+    for t in trace_data:
+
+        fig.add_trace(
+            go.Bar({
+                'name': t[0],
+                'x': t[1],
+                'y': t[2],
+            })
+        )
+
+    fig.show()
+
     pass
 
 
-def run(archive, demo):
+
+def run(path, demo):
 
     t0 = time()
 
@@ -39,15 +91,17 @@ def run(archive, demo):
     # if csv doesn't exist, create dataframe from html archive and 
     # write it to disk for next run
     
-    if not os.path.exists(f'{archive}.csv'):
+    fn = path.split('.')
+    suffix = fn[-1]
 
-        root = bs(open(f'{archive}.html').read(), 'lxml')
-        df = get_df(root)
-        df.write_csv(f'{archive}.csv')
+    if suffix == 'html':
+        
+        df = read_html(path)
+        df.write_csv()
 
     else:
 
-        df = pl.read_csv(f'{archive}.csv')
+        df = pl.read_csv(path, try_parse_dates = True)
 
     demos[demo](df)
 
@@ -56,8 +110,8 @@ def run(archive, demo):
 
 if __name__ == '__main__':
 
-    archive = argv[1]
+    path = argv[1]
     demo = argv[2]
     
-    run(archive, demo)
+    run(path, demo)
     
