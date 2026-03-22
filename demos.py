@@ -7,7 +7,7 @@ from time import time
 
 # python demos.py <archive> <demo>
 #
-# archive: path to exported archive
+# archive: path to exported archive (include extension)
 # demo: display, post_count
 
 
