@@ -34,7 +34,8 @@ def post_count(df):
         pl.col('username')
     ).agg(
         pl.len().alias('post_count')
-    ).sort('date')
+    )
+    
 
     per_user = p_counts.group_by('username', maintain_order = True)
     total = p_counts.group_by('date').agg(pl.col('post_count').sum())
@@ -71,9 +72,6 @@ def post_count(df):
         )
 
     fig.show()
-
-    pass
-
 
 
 def run(path, demo):
