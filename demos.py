@@ -8,7 +8,7 @@ from time import time
 # python demos.py <archive> <demo> [ demo params ... ]
 #
 # archive: path to exported archive (include extension)
-# optional parameters: 
+# demo parameters: 
 #       display: username 
 #       post_count: daily
 
@@ -25,8 +25,6 @@ def display(df, params):
 
 def post_count(df, params):
 
-    # monthly post count 
-
     if params and params[0] == 'daily':
     
         df = df.with_columns(
@@ -34,6 +32,8 @@ def post_count(df, params):
         )
 
     else:
+
+        # monthly post count 
 
         df = df.with_columns(
             pl.date(
@@ -50,7 +50,6 @@ def post_count(df, params):
         pl.len().alias('post_count')
     )
     
-
     per_user = p_counts.group_by('username', maintain_order = True)
     total = p_counts.group_by('date').agg(pl.col('post_count').sum())
 
