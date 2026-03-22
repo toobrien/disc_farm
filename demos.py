@@ -5,29 +5,43 @@ import polars as pl
 from sys import argv
 from time import time
 
-# python demos.py <archive> <demo>
+# python demos.py <archive> <demo> [ demo params ... ]
 #
 # archive: path to exported archive (include extension)
-# demo: display, post_count
+# optional parameters: 
+#       display: username 
+#       post_count: daily
 
 
-def display(df):
+def display(df, params):
+
+    if params:
+
+        df = df.filter(pl.col('username') == params[0])
 
     print(df.shape)
     print(df)
 
 
-def post_count(df):
+def post_count(df, params):
 
     # monthly post count 
 
-    df = df.with_columns(
-        pl.date(
-            pl.col('ts').dt.year(),
-            pl.col('ts').dt.month(),
-            1
-        ).alias('date')
-    )
+    if params and params[0] == 'daily':
+    
+        df = df.with_columns(
+            pl.col('ts').dt.date().alias('date')
+        )
+
+    else:
+
+        df = df.with_columns(
+            pl.date(
+                pl.col('ts').dt.year(),
+                pl.col('ts').dt.month(),
+                1
+            ).alias('date')
+        )
 
     p_counts = df.group_by(
         pl.col('date'),
@@ -74,7 +88,7 @@ def post_count(df):
     fig.show()
 
 
-def run(path, demo):
+def run(path, demo, params):
 
     t0 = time()
 
@@ -101,7 +115,7 @@ def run(path, demo):
 
         df = pl.read_csv(path, try_parse_dates = True)
 
-    demos[demo](df)
+    demos[demo](df, params)
 
     print(f'{time() - t0:0.2f}s')
 
@@ -111,5 +125,5 @@ if __name__ == '__main__':
     path = argv[1]
     demo = argv[2]
     
-    run(path, demo)
+    run(path, demo, argv[3:])
     
