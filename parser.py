@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup as bs
+from json import loads
 import polars as pl
 import re
 
@@ -48,7 +49,6 @@ def read_html(path, i = 0, j = None):
     ts_exp = re.compile('chatlog__(short-|system-notification-)*timestamp')
     author_exp = re.compile('chatlog__(system-notification-)*author')
     content_exp = re.compile('chatlog__(system-notification-)*content')
-    mentions_exp = re.compile('.chatlog__markdown-mention')
     
     ts = []
     username = []
@@ -108,3 +108,10 @@ def read_html(path, i = 0, j = None):
         'mentions': mentions,
         'attachments': attachments
     })
+
+
+def read_json(path):
+
+    msgs = loads(open(path).read())
+    
+    pass
