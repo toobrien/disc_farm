@@ -108,7 +108,7 @@ def run(path, demo, params):
     if suffix == 'html':
         
         df = read_html(path)
-        df.write_csv()
+        df.write_csv(f'{fn[0]}.csv')
 
     else:
 

@@ -4,6 +4,9 @@ DiscordChatExporter.Cli.osx-arm64
 *.html
 *.ipynb
 .ipynb_checkpoints
+*.json
 .git
 .venv
 .vscode
+channels/*
+config.json
