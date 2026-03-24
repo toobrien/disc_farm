@@ -7,6 +7,11 @@ from sys import argv
 
 CONFIG_PATH = path.join('.', 'config.json')
 DATA_PATH = path.join('.', 'data')
+FMT = {
+    'csv': 'Csv',
+    'json': 'Json',
+    'html': 'HtmlDark'
+}
 
 def get_config():
 
@@ -71,15 +76,12 @@ def create_channel(args):
         print(f'[ERROR] cli_path not in config; run `set-config -p ...` to set the exporter path')
         exit(1)
 
-    fmt = args.format
-    fmt_ = fmt[0].upper() + fmt[1:]
-
     exporter_args = [
         config['cli_path'], 'export',
         '-t', config['token'],
         '-c', args.id,
-        '-f', fmt_,
-        '-o', path.join(DATA_PATH, f'{args.name}.{fmt}'),
+        '-f', FMT[args.format],
+        '-o', path.join(DATA_PATH, f'{args.name}.{args.format}'),
     ]
 
     if (args.start):
