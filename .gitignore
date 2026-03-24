@@ -8,5 +8,5 @@ DiscordChatExporter.Cli.osx-arm64
 .git
 .venv
 .vscode
-channels/*
+data/*
 config.json

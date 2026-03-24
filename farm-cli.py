@@ -1,8 +1,44 @@
 from argparse import ArgumentParser
+from json import dump, load, JSONDecodeError
+from os import path
 from sys import argv
 
 
+CONFIG_PATH = path.join('.', 'config.json')
+
+
 def set_config(args):
+        
+    if path.exists(CONFIG_PATH):
+
+        with open(CONFIG_PATH, "r") as fd:
+
+            try:
+                
+                config = load(fd)
+
+            except JSONDecodeError:
+
+                config = {}
+    
+    else:
+
+        config = {}
+
+    if args.token:
+
+        config['token'] = args.token
+        print(f'set token: {args.token[0:5]}...{args.token[-5:]}')
+
+    if args.cli_path:
+
+        config['cli_path'] = args.cli_path
+        print(f'set cli path: {args.cli_path}')
+
+    with open(CONFIG_PATH, 'w') as fd:
+        
+        dump(config, fd)
+        print(f'config written to {CONFIG_PATH}')
 
     pass
 
