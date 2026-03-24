@@ -1,29 +1,37 @@
 from argparse import ArgumentParser
 from json import dump, load, JSONDecodeError
 from os import path
+from subprocess import run
 from sys import argv
 
 
 CONFIG_PATH = path.join('.', 'config.json')
+DATA_PATH = path.join('.', 'data')
 
+def get_config():
 
-def set_config(args):
-        
-    if path.exists(CONFIG_PATH):
+    try:
 
-        with open(CONFIG_PATH, "r") as fd:
+        with open(CONFIG_PATH) as fd:
 
             try:
-                
-                config = load(fd)
+                        
+                return load(fd)
 
-            except JSONDecodeError:
+            except JSONDecodeError as e:
 
-                config = {}
+                print(f'[ERROR] {CONFIG_PATH} is malformatted: {e}')
+                exit(1)
     
-    else:
+    except FileNotFoundError:
 
-        config = {}
+        print(f'[ERROR] config not found; run `set-config` command to set token and exporter cli path')
+        exit(1)
+    
+
+def set_config(args):
+
+    config = get_config() if path.exists(CONFIG_PATH) else { "channels": {} }
 
     if args.token:
 
@@ -44,6 +52,42 @@ def set_config(args):
 
 
 def create_channel(args):
+
+    config = get_config()
+    channels = config['channels']
+
+    if args.name in channels:
+
+        print(f'[ERROR] channel {args.channel} already exists')
+        exit(1)
+    
+    if 'token' not in config:
+
+        print(f'[ERROR] no token in config; run `set-config -t ...` to set the token')
+        exit(1)
+
+    if 'cli_path' not in config:
+
+        print(f'[ERROR] cli_path not in config; run `set-config -p ...` to set the exporter path')
+        exit(1)
+
+    fmt = args.format
+    fmt_ = fmt[0].upper() + fmt[1:]
+
+    exporter_args = [
+        config['cli_path'], 'export',
+        '-t', config['token'],
+        '-c', args.id,
+        '-f', fmt_,
+        '-o', path.join(DATA_PATH, f'{args.name}.{fmt}'),
+    ]
+
+    if (args.start):
+
+        exporter_args.append('--after')
+        exporter_args.append(args.start)
+    
+    run(exporter_args)
 
     pass
 
@@ -69,7 +113,7 @@ if __name__ == "__main__":
     create_parser.add_argument('--name', '-n', required = True)
     create_parser.add_argument('--id', '-i', required = True)
     create_parser.add_argument('--format', '-f', choices = fmts, default = 'html')
-    create_parser.add_argument('--start-date', '-s')
+    create_parser.add_argument('--start', '-s')
     create_parser.set_defaults(func = create_channel)
     
     update_parser = parsers.add_parser('update-channel')
