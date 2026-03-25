@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from bs4 import BeautifulSoup as bs
 from json import dump, load, JSONDecodeError
 from os import path, remove
 from polars import read_csv
@@ -79,12 +80,30 @@ def merge(fmt, tmpfile, outfile):
 
     if fmt == 'html':
 
+        tmp = bs(open(tmpfile).read(), 'lxml')
+        out = bs(open(outfile).read(), 'lxml')
+
+        tmp_cl = tmp.find(class_ = 'chatlog')
+        out_cl = out.find(class_ = 'chatlog')
+
+        tmp_groups = tmp_cl.find_all(class_ = 'chatlog__message-group')
+        out_groups = out_cl.find_all(class_ = 'chatlog__message-group')
+
+        out_latest = out_groups[-1].find_all(class_ = 'chatlog__message-container')[-1].attrs['data-message-id']
+        tmp_oldest = tmp_groups[0].find(class_ = 'chatlog__message-container').attrs['data-message-id']
+
+        # TODO 
+        
+        if out_latest != tmp_oldest:
+
+            pass
+
         pass
 
     elif fmt == 'json':
 
         # TODO
-        
+
         pass
 
     pass
