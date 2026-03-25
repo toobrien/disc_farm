@@ -113,5 +113,7 @@ def read_html(path, i = 0, j = None):
 def read_json(path):
 
     msgs = loads(open(path).read())
+
+    # TODO
     
     pass
