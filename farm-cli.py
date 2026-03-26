@@ -143,8 +143,6 @@ def set_config(args):
         dump(config, fd, indent = 4)
         print(f'config written to {CONFIG_PATH}')
 
-    pass
-
 
 def create_channel(args):
 
@@ -199,8 +197,6 @@ def create_channel(args):
         except Exception as e:
 
             print(f'[ERROR] unable to write config to {CONFIG_PATH}: {e}')      
-
-    pass
 
 
 def update_channel(args):
@@ -290,5 +286,3 @@ if __name__ == "__main__":
 
     args = parser.parse_args(argv[1:])
     args.func(args)
-
-    pass
