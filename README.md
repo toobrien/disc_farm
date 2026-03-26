@@ -9,19 +9,36 @@ $ python farm-cli.py set-config "-t" <token>  -p <path to exporter>
 2. create channel:
 
 ```bash
-$ python farm-cli.py create-channel -n <friendly name> -i <channel id> -f [html|json|csv] -s [start date] -o parsed-only
+$ python farm-cli.py create-channel -n <name> -i <channel id> -f [html|json|csv] -s [start date] -o parsed-only
 ```
 
-set `sources-only`, `parsed-only`, or `all` to retain sources (html, json, exporter csv), parsed dataframe output (csv), or both
+3. update channel:
 
-for `-f`:
+```bash
+$ python farm-cli.py update-channel -n <name>
+ ```
+
+
+regarding `create-channel`:
+
+`-o`: 
+
+- `sources-only`: retain only the exporter outputs
+- `parsed-only`: retain only the csv (identical to `sources-only` for `-f csv`) 
+- `all`: keep both source and csv
+
+`-f`:
 
 - `html`: default format, medium size
 - `json`: not yet supported, large size
 - `csv` fastest, no parsing, small size
 
-3. update channel:
+'-s': optional, set start date of initial download
+
+`-n`: pick whatever name you want for the channel
+
+for help with the token, run the exporter's guide command:
 
 ```bash
-$ python farm-cli.py update-channel -n <friendly name>
- ```
+$ ./DiscordChatExporter.Cli guide
+```
