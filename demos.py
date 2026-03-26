@@ -8,7 +8,7 @@ from time import time
 
 # python demos.py <archive> <demo> [ demo params ... ]
 #
-# archive: path to exported archive (include extension)
+# archive: name of exported channel (see README)
 # demo parameters: 
 #       display: username 
 #       post_count: daily
