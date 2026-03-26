@@ -3,7 +3,7 @@ get exporter [here](https://github.com/Tyrrrz/DiscordChatExporter/releases/lates
 1. get set config:
 
  ```bash
-$ python farm-cli.py set-config "-t" <token>  -p <path to exporter>
+$ python farm-cli.py set-config -t <token>  -p <path to exporter>
 ``` 
 
 2. create channel:
@@ -33,7 +33,7 @@ regarding `create-channel`:
 - `json`: not yet supported, large size
 - `csv` fastest, no parsing, small size
 
-'-s': optional, set start date of initial download
+`-s`: optional, set start date of initial download
 
 `-n`: pick whatever name you want for the channel
 
