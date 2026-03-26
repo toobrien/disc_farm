@@ -12,7 +12,7 @@ $ python farm-cli.py set-config "-t" <token>  -p <path to exporter>
 $ python farm-cli.py create-channel -n <name> -i <channel id> -f [html|json|csv] -s [start date] -o parsed-only
 ```
 
-3. update channel:
+3. update channel (get new messages):
 
 ```bash
 $ python farm-cli.py update-channel -n <name>
