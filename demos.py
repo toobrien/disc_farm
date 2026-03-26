@@ -1,4 +1,5 @@
 
+from os import path
 from parser import read_html
 import plotly.graph_objects as go
 import polars as pl
@@ -87,7 +88,7 @@ def post_count(df, params):
     fig.show()
 
 
-def run(path, demo, params):
+def run(name, demo, params):
 
     t0 = time()
 
@@ -99,20 +100,7 @@ def run(path, demo, params):
     pl.Config.set_tbl_rows(-1)
     pl.Config.set_tbl_cols(-1)
 
-    # if csv doesn't exist, create dataframe from html archive and 
-    # write it to disk for next run
-    
-    fn = path.split('.')
-    suffix = fn[-1]
-
-    if suffix == 'html':
-        
-        df = read_html(path)
-        df.write_csv(f'{fn[0]}.csv')
-
-    else:
-
-        df = pl.read_csv(path, try_parse_dates = True)
+    df = pl.read_csv(path.join('.', 'data', f'{name}.csv'), try_parse_dates = True)
 
     demos[demo](df, params)
 
@@ -121,8 +109,8 @@ def run(path, demo, params):
 
 if __name__ == '__main__':
 
-    path = argv[1]
+    name = argv[1]
     demo = argv[2]
     
-    run(path, demo, argv[3:])
+    run(name, demo, argv[3:])
     
