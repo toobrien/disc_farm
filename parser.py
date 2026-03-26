@@ -3,8 +3,14 @@ from json import loads
 import polars as pl
 import re
 
-schema = {
-    'ts'
+HTML_SCHEMA = {
+    'ts': pl.Datetime,
+    'username': pl.String,
+    'user_id': pl.String,
+    'displayname': pl.String,
+    'content': pl.String,
+    'mentions': pl.String,
+    'attachments': pl.String
 }
 
 
@@ -99,15 +105,18 @@ def read_html(path, i = 0, j = None):
         mentions.append(mentions_o)
         attachments.append(attachments_o)
 
-    return pl.DataFrame({
-        'ts': pl.Series(ts).str.to_datetime('%A, %B %-d, %Y %-I:%M %p'),
-        'username': username,
-        'user_id': user_id,
-        'displayname': displayname,
-        'content': content,
-        'mentions': mentions,
-        'attachments': attachments
-    })
+    return pl.DataFrame(
+        {
+            'ts': pl.Series(ts).str.to_datetime('%A, %B %-d, %Y %-I:%M %p'),
+            'username': username,
+            'user_id': user_id,
+            'displayname': displayname,
+            'content': content,
+            'mentions': mentions,
+            'attachments': attachments
+        }, 
+        schema = HTML_SCHEMA
+    )
 
 
 def read_json(path):

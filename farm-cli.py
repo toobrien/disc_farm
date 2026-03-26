@@ -88,25 +88,40 @@ def merge(fmt, tmpfile, outfile):
 
         tmp_groups = tmp_cl.find_all(class_ = 'chatlog__message-group')
         out_groups = out_cl.find_all(class_ = 'chatlog__message-group')
-
-        out_latest = out_groups[-1].find_all(class_ = 'chatlog__message-container')[-1].attrs['data-message-id']
-        tmp_oldest = tmp_groups[0].find(class_ = 'chatlog__message-container').attrs['data-message-id']
-
-        # TODO 
         
-        if out_latest != tmp_oldest:
+        out_last_msgs = out_groups[-1].find_all(class_ = 'chatlog__message-container')
+        tmp_first_msgs = tmp_groups[0].find_all(class_ = 'chatlog__message-container')
+        
+        tmp_last_msg_ids = [ msg.attrs['data-message-id'] for msg in tmp_first_msgs ]
+        
+        try:
+        
+            i = tmp_last_msg_ids.index(out_last_msgs[-1].attrs['data-message-id'])
 
-            pass
+            for msg in tmp_first_msgs[i + 1:]:
 
-        pass
+                out_groups[-1].append(msg)
+
+            tmp_groups = tmp_groups[1:]
+
+        except ValueError:
+
+            print('[WARN] no merge point detected; messages may be missing')
+        
+        for group in tmp_groups:
+
+            out_cl.append('\n                ')
+            out_cl.append(group)
+
+        with open(outfile, 'w') as fd:
+
+            fd.write(str(out))
 
     elif fmt == 'json':
 
         # TODO
 
         pass
-
-    pass
 
 
 def set_config(args):
@@ -154,7 +169,7 @@ def create_channel(args):
     outfile = path.join(DATA_PATH, f'{args.name}.{args.input_format}')
     start = args.start if args.start else None
     
-    export(config, args.id, FMT[args.input_format], outfile, start)
+    export(config, args.id, args.input_format, outfile, start)
 
     channels[args.name] = {
         'id': args.id,
@@ -226,7 +241,7 @@ def update_channel(args):
         try:
 
             csvfile = path.join(DATA_PATH, f'{args.name}.csv')
-            df = read_csv(csvfile).vstack(df[1:])
+            df = read_csv(csvfile, schema = df.schema).vstack(df).unique(maintain_order = True)
             df.write_csv(csvfile)
 
         except Exception as e:
@@ -234,19 +249,19 @@ def update_channel(args):
             print(f'[ERROR] unable to update {csvfile}: {e}')
             exit(1)
 
-    with open(CONFIG_PATH) as fd:
+    with open(CONFIG_PATH, 'w') as fd:
 
         try:
             
-            channel['latest'] = df[-1]['ts'].dt.to_string()[0] if args.input_format != 'csv' else df[-1]['Date'][0]
-            dump(fd, config)
+            channel['latest'] = df[-1]['ts'].dt.to_string()[0] if fmt != 'csv' else df[-1]['Date'][0]
+            dump(config, fd, indent = 4)
 
         except Exception as e:
 
             print(f'[ERROR] unable to write config: {e}')
             exit(1)
-        
-    pass
+    
+    remove(tmpfile)
 
 
 if __name__ == "__main__":
