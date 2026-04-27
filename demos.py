@@ -87,7 +87,6 @@ def post_count(df, params):
 
     fig.show()
 
-
 def run(name, demo, params):
 
     t0 = time()

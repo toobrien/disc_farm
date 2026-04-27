@@ -11,3 +11,4 @@ out
 .vscode
 data/*
 config.json
+tmp.py
